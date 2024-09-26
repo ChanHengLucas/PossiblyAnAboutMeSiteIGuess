@@ -9,6 +9,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+
+
 </head>
 
 <style> 
@@ -34,6 +36,21 @@
         font-family: 'Comic Sans MS', cursive, sans-serif;
     }
 
+    /* @keyframes move {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(200px, 0); }
+    50% { transform: translate(200px, 200px); }
+    75% { transform: translate(0, 200px); }
+    100% { transform: translate(0, 0); }
+    } */
+
+    .laplushMoveSquare {
+    animation: move 0.2s infinite;
+    }
+
+    .laplushShadow {
+    box-shadow: 10px 10px 5px grey;
+    }
 
 </style>
 
@@ -41,6 +58,73 @@
 <body>
 
 
+    <script>
+       // Function to refresh the animation
+    function refreshAnimation() {
+        var laplushImages = document.querySelectorAll('.laplushChaos');
+        var audio = new Audio('yippee.mp3');
+        // Generate random percentages for the animation
+        laplushImages.forEach(function(image, index){
+            var randomPercentages = [
+                Math.random() * 300,
+                Math.random() * 300,
+                Math.random() * 300,
+                Math.random() * 300,
+                Math.random() * 300,
+                Math.random() * 300,
+                Math.random() * 300,
+                Math.random() * 300,
+                Math.random() * 300,
+                Math.random() * 300
+            ];
+
+            // Generate a random number between 0 and 1
+            var randomNumber = Math.random();
+
+            // If the random number is less than 0.01 (approximately 1% chance)
+            if (randomNumber < 0.0025) {
+                // Play the sound effect
+                audio.play();
+            }
+        
+
+    // Create the keyframes CSS as a string
+    //  box-shadow: 0 0 10px 5px rgba(0,0,0,0.5); 
+    var keyframesCSS = `
+        @keyframes move${index} {
+            0% { transform: translate(${randomPercentages[0]}px, ${randomPercentages[1]}px);}
+            25% { transform: translate(${randomPercentages[2]}px, ${randomPercentages[3]}px);}
+            50% { transform: translate(${randomPercentages[4]}px, ${randomPercentages[5]}px);}
+            75% { transform: translate(${randomPercentages[6]}px, ${randomPercentages[7]}px);}
+            100% { transform: translate(${randomPercentages[8]}px, ${randomPercentages[9]}px);}
+        }
+    `;
+
+    // Create a new style element
+    var styleElement = document.createElement('style');
+
+    // Set the CSS text of the style element
+    styleElement.textContent = keyframesCSS;
+
+    // Append the style element to the head of the document
+    document.head.appendChild(styleElement);
+
+    image.style.animation = `move${index} 0.2s infinite`;
+
+    image.style.boxShadow = '0 0 10px 5px rgba(0,0,0,0.5)';
+        image.style.transition = 'box-shadow 1s';
+    });
+
+    
+    }
+
+    // Call the function to start the animation
+    refreshAnimation();
+
+    // Set an interval to refresh the animation every second
+    setInterval(refreshAnimation, 80);
+    </script>
+    
 <h1>About Me</h1>
 <p>Hello whoever is reading this random site. I am <span class="keyword">Lucas Chan</span>.</p>
 <p>I am currently a Class II <span class="keyword">Milton Academy</span> student boarding in <span class="keyword">Norris House</span>.</p>
@@ -50,5 +134,11 @@
 <p>As you can obviously see, I am a huge fan of <span class="keyword">Pokémon</span> and random things like <span class="keyword">sudokus</span> and <span class="keyword unfunny">this font</span>.</p>
 
 <!-- Add a fun fact button that grants user a random fun fact I suppose??? -->
+
+<img id="laplush" class="laplushChaos" src="laplush.png" alt="bruh">
+<img id="laplush" class="laplushChaos" src="laplush.png" alt="bruh">
+<img id="laplush" class="laplushChaos" src="laplush.png" alt="bruh">
+<img id="laplush" class="laplushChaos" src="laplush.png" alt="bruh">
+<img id="laplush" class="laplushChaos" src="laplush.png" alt="bruh">
 
 </body>
