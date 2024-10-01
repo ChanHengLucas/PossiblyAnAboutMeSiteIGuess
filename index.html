@@ -57,12 +57,12 @@
 
 <body>
 
-
     <script>
        // Function to refresh the animation
     function refreshAnimation() {
         var laplushImages = document.querySelectorAll('.laplushChaos');
         var audio = new Audio('yippee.mp3');
+        var clone = audio.cloneNode();
         // Generate random percentages for the animation
         laplushImages.forEach(function(image, index){
             var randomPercentages = [
@@ -82,9 +82,9 @@
             var randomNumber = Math.random();
 
             // If the random number is less than 0.01 (approximately 1% chance)
-            if (randomNumber < 0.0025) {
+            if (randomNumber < 0.01) {
                 // Play the sound effect
-                audio.play();
+                clone.play();
             }
         
 
@@ -124,7 +124,7 @@
     // Set an interval to refresh the animation every second
     setInterval(refreshAnimation, 80);
     </script>
-    
+
 <h1>About Me</h1>
 <p>Hello whoever is reading this random site. I am <span class="keyword">Lucas Chan</span>.</p>
 <p>I am currently a Class II <span class="keyword">Milton Academy</span> student boarding in <span class="keyword">Norris House</span>.</p>
@@ -140,5 +140,28 @@
 <img id="laplush" class="laplushChaos" src="laplush.png" alt="bruh">
 <img id="laplush" class="laplushChaos" src="laplush.png" alt="bruh">
 <img id="laplush" class="laplushChaos" src="laplush.png" alt="bruh">
+
+
+
+<!-- when image clicked, direct to new page with boss fight against laplush.png -->
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all laplush images
+        var laplushImages = document.querySelectorAll('.laplushChaos');
+
+        // Loop through each image
+        laplushImages.forEach(function(image) {
+            // Add a click event listener to the image
+            image.addEventListener('click', function() {
+                // Redirect to battle.html
+                console.log('Clicked on Laplush!');
+                window.location.href = 'battle.html';
+            });
+
+            // Rest of your code...
+        });
+    });
+</script>
 
 </body>

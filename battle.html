@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+
+<link rel="stylesheet" type="text/css" href="styles.css">
+
+<link rel="icon" href="laplush.png">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style> 
+
+    body { 
+        background: linear-gradient(to right, #00cecb, #511eeb);
+        font-family: 'Arial';
+        /* animation: gradient 5s linear infinite; */
+        background-size: 120% 120%;
+    }
+
+    @keyframes keyword{
+        0% {color: rgb(191, 0, 0);}
+        50% {color: rgb(191, 121, 0);}
+        100% {color: rgb(191, 0, 0);}
+    }
+
+    .keyword {
+        animation: keyword 2s linear infinite;
+    }
+
+    .unfunny{
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+    }
+
+    /* @keyframes move {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(200px, 0); }
+    50% { transform: translate(200px, 200px); }
+    75% { transform: translate(0, 200px); }
+    100% { transform: translate(0, 0); }
+    } */
+
+    .laplushMoveSquare {
+    animation: move 0.2s infinite;
+    }
+
+    .laplushShadow {
+    box-shadow: 10px 10px 5px grey;
+    }
+
+</style>
+
+<body>
+    
+<label id="typeLabel" for="pokemonType">Choose a Pokémon Type:</label><br><br>
+<select id="pokemonType" name="pokemonType">
+    <option value="normal">Normal</option>
+    <option value="fire">Fire</option>
+    <option value="water">Water</option>
+    <option value="grass">Grass</option>
+    <option value="electric">Electric</option>
+    <option value="psychic">Psychic</option>
+    <option value="fighting">Fighting</option>
+    <option value="flying">Flying</option>
+    <option value="poison">Poison</option>
+    <option value="ground">Ground</option>
+    <option value="rock">Rock</option>
+    <option value="bug">Bug</option>
+    <option value="ghost">Ghost</option>
+    <option value="steel">Steel</option>
+    <option value="ice">Ice</option>
+    <option value="dragon">Dragon</option>
+    <option value="dark">Dark</option>
+    <option value="fairy">Fairy</option>
+</select>
+<br><br>
+<input type="submit" id="submit" value="Submit">
+
+<script>
+    // <!-- HP bar, enemy HP bar, attack (special), defend (special), attack boost, defense boost, speed, -->
+    // <!-- Player moveset is determined by chosen type??? -->
+    // <!-- Player moveset: Calm Mind, Judgement, Recover, Shadow Ball -->
+    // <!-- Player held item: Plate (Depending on type)-->
+document.addEventListener('DOMContentLoaded', function() {   
+    var playerHP = 444;
+    var playerAttack = 372;
+    var playerDefense = 372;
+    var playerSpeed = 372;
+    var playerType = "Normal"; // default type
+    // <!-- Change playerType depending on player input -->
+    document.getElementById('submit').addEventListener('click', function(event) {
+        // Prevent the form from being submitted
+        event.preventDefault();
+
+        // Get the value of the input field
+        var inputType = document.getElementById('pokemonType').value;
+
+        // Check if the input is not empty
+        if (inputType) {
+            // Set playerType to the input value
+            playerType = inputType;
+            console.log('Player type is now: ' + playerType);
+
+            // Hide the select menu
+            document.getElementById('pokemonType').style.display = 'none';
+            document.getElementById('typeLabel').style.display = 'none';
+            document.getElementById('submit').style.display = 'none';
+        }
+    });
+    var playerMoveset = ["Calm Mind", "Judgement", "Recover", "Shadow Ball"];
+    
+    var LaplushHP = 465;
+    var LaplushAttack = 295;
+    var LaplushDefense = 317;
+    var LaplushSpeed = 240;
+    var LaplushHeldItem = "Leftovers"; 
+    var LaplushType = ["Water", "Ice"]; // might replace with specific weaknesses and strengths instead
+    var LaplushMoveset = ["Ice Beam", "Brine", "Thunderbolt", "Ancient Power"];
+    // <!-- regen 1/16 of max HP per turn -->
+    
+    
+    
+    // <!-- Enemy Laplush moveset: Ice Beam (Higher dmg), Brine (Higher dmg), Thunderbolt, Ancient Power -->
+    // <!-- Enemy Laplush held item: Leftovers -->
+  
+});
+</script>
+
+
+</body>
