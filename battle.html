@@ -1,10 +1,14 @@
 <!DOCTYPE html>
+<html>
 
+<head>
+    <title>Interesting...</title>
 <link rel="stylesheet" type="text/css" href="styles.css">
 
 <link rel="icon" href="laplush.png">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
 
 <style> 
 
@@ -45,83 +49,253 @@
     box-shadow: 10px 10px 5px grey;
     }
 
+    #battle-frame {
+        display: none;
+        width: 1000px;
+        height: 550px;
+        /* border: 2px solid black; */
+        position: relative;
+        margin: auto;
+        background-image: url('Water Background Pokemon.png'); /* Replace with your background image */
+    }
+    .pokemon {
+        position: absolute;
+        width: 150px;
+        height: 150px;
+    }
+    #player {
+        bottom: 0px; /* Adjust as needed */
+        left: 100px; /* Adjust as needed */
+        width: 360px; /* Adjust as needed */
+        height: 360px; /* Adjust as needed */
+    }
+
+    #laplush {
+        top: 100px; /* Adjust as needed */
+        right: 120px; /* Adjust as needed */
+        width: 270px; /* Adjust as needed */
+        height: 270px; /* Adjust as needed */
+    }
+
 </style>
 
 <body>
-    
-<label id="typeLabel" for="pokemonType">Choose a Pokémon Type:</label><br><br>
-<select id="pokemonType" name="pokemonType">
-    <option value="normal">Normal</option>
-    <option value="fire">Fire</option>
-    <option value="water">Water</option>
-    <option value="grass">Grass</option>
-    <option value="electric">Electric</option>
-    <option value="psychic">Psychic</option>
-    <option value="fighting">Fighting</option>
-    <option value="flying">Flying</option>
-    <option value="poison">Poison</option>
-    <option value="ground">Ground</option>
-    <option value="rock">Rock</option>
-    <option value="bug">Bug</option>
-    <option value="ghost">Ghost</option>
-    <option value="steel">Steel</option>
-    <option value="ice">Ice</option>
-    <option value="dragon">Dragon</option>
-    <option value="dark">Dark</option>
-    <option value="fairy">Fairy</option>
-</select>
-<br><br>
-<input type="submit" id="submit" value="Submit">
+ 
+<form id="typeForm">    
+    <label id="typeLabel" for="pokemonType">Choose a Pokémon Type:</label><br><br>
+    <select id="pokemonType" name="pokemonType">
+        <option value="normal">Normal</option>
+        <option value="fire">Fire</option>
+        <option value="water">Water</option>
+        <option value="grass">Grass</option>
+        <option value="electric">Electric</option>
+        <option value="psychic">Psychic</option>
+        <option value="fighting">Fighting</option>
+        <option value="flying">Flying</option>
+        <option value="poison">Poison</option>
+        <option value="ground">Ground</option>
+        <option value="rock">Rock</option>
+        <option value="bug">Bug</option>
+        <option value="ghost">Ghost</option>
+        <option value="steel">Steel</option>
+        <option value="ice">Ice</option>
+        <option value="dragon">Dragon</option>
+        <option value="dark">Dark</option>
+        <option value="fairy">Fairy</option>
+    </select>
+    <br><br>
+    <input type="submit" id="submit" value="Submit">
+</form>
 
+<div id="battle-frame" style="display: none;">
+    <img id="player" class="pokemon" src="The Player.png"> <!-- Replace with your player's image -->
+    <img id="laplush" class="pokemon" src="LaplushBattle.png"> <!-- Replace with Laplush's image -->
+</div>
+
+
+    <!-- HP bar, enemy HP bar, attack (special), defend (special), attack boost, defense boost, speed, -->
+    <!-- Player moveset is determined by chosen type??? -->
+    <!-- Player moveset: Calm Mind, Judgement, Recover, Shadow Ball -->
+    <!-- Player held item: Plate (Depending on type)-->
 <script>
-    // <!-- HP bar, enemy HP bar, attack (special), defend (special), attack boost, defense boost, speed, -->
-    // <!-- Player moveset is determined by chosen type??? -->
-    // <!-- Player moveset: Calm Mind, Judgement, Recover, Shadow Ball -->
-    // <!-- Player held item: Plate (Depending on type)-->
-document.addEventListener('DOMContentLoaded', function() {   
-    var playerHP = 444;
-    var playerAttack = 372;
-    var playerDefense = 372;
-    var playerSpeed = 372;
-    var playerType = "Normal"; // default type
-    // <!-- Change playerType depending on player input -->
-    document.getElementById('submit').addEventListener('click', function(event) {
-        // Prevent the form from being submitted
-        event.preventDefault();
+    document.addEventListener('DOMContentLoaded', function() {   
+        var form = document.getElementById('typeForm');
+        var battleFrame = document.getElementById('battle-frame');
+        var playerPokemonType = document.getElementById('pokemonType');
 
-        // Get the value of the input field
-        var inputType = document.getElementById('pokemonType').value;
+        // debug lines
+        console.log(form); // Should log the form element
+        console.log(battleFrame); // Should log the battle frame element
+        console.log(pokemonType); // Should log the select element
 
-        // Check if the input is not empty
-        if (inputType) {
-            // Set playerType to the input value
-            playerType = inputType;
-            console.log('Player type is now: ' + playerType);
+        var playerHP = 444;
+        var playerSpAtk = 372;
+        var playerSpDef = 372;
+        var playerSpeed = 372;
+        var playerType = ["Normal"]; // default type
+        // <!-- Change playerType depending on player input -->
+        document.getElementById('submit').addEventListener('click', function(event) {
+            // Prevent the form from being submitted
+            event.preventDefault();
 
-            // Hide the select menu
-            document.getElementById('pokemonType').style.display = 'none';
-            document.getElementById('typeLabel').style.display = 'none';
-            document.getElementById('submit').style.display = 'none';
+            // Get the value of the input field
+            var inputType = document.getElementById('pokemonType').value;
+
+            // Check if the input is not empty
+            if (inputType) {
+                // Set playerType to the input value
+                playerType[0] = inputType;
+                console.log('Player type is now: ' + playerType[0]);
+
+                // Hide the select menu
+                document.getElementById('pokemonType').style.display = 'none';
+                document.getElementById('typeLabel').style.display = 'none';
+                document.getElementById('submit').style.display = 'none';
+
+                // Show the battle frame
+                document.getElementById('battle-frame').style.display = 'block';
+            }
+        });
+        // var playerMoveset = ["Calm Mind", "Judgement", "Recover", "Shadow Ball"];
+
+        var LaplushHP = 465;
+        var LaplushSpAtk = 295;
+        var LaplushSpDef = 317;
+        var LaplushSpeed = 240;
+        var LaplushHeldItem = "Leftovers"; 
+        var LaplushType = ["Water", "Ice"]; // might replace with specific weaknesses and strengths instead
+        // var LaplushMoveset = ["Ice Beam", "Brine", "Thunderbolt", "Ancient Power"];
+        // <!-- regen 1/16 of max HP per turn -->
+        
+        
+        
+        // <!-- Enemy Laplush moveset: Ice Beam (Higher dmg), Brine (Higher dmg), Thunderbolt, Ancient Power -->
+        // <!-- Enemy Laplush held item: Leftovers -->
+    
+
+        // Laplush should move around the screen with laplushChaos class
+        // Laplush movement speed around the screen should scale with HP * 2
+
+        var typeChart = {
+            "Normal": {"Rock": 0.5, "Ghost": 0, "Steel": 0.5},
+            "Fire": {"Fire": 0.5, "Water": 0.5, "Grass": 2, "Ice": 2, "Bug": 2, "Rock": 0.5, "Dragon": 0.5, "Steel": 2},
+            "Water": {"Fire": 2, "Water": 0.5, "Grass": 0.5, "Ground": 2, "Rock": 2, "Dragon": 0.5},
+            "Electric": {"Water": 2, "Electric": 0.5, "Grass": 0.5, "Ground": 0, "Flying": 2, "Dragon": 0.5},
+            "Grass": {"Fire": 0.5, "Water": 2, "Grass": 0.5, "Poison": 0.5, "Ground": 2, "Flying": 0.5, "Bug": 0.5, "Rock": 2, "Dragon": 0.5, "Steel": 0.5},
+            "Ice": {"Fire": 0.5, "Water": 0.5, "Grass": 2, "Ice": 0.5, "Ground": 2, "Flying": 2, "Dragon": 2, "Steel": 0.5},
+            "Fighting": {"Normal": 2, "Ice": 2, "Poison": 0.5, "Flying": 0.5, "Psychic": 0.5, "Bug": 0.5, "Rock": 2, "Ghost": 0, "Dark": 2, "Steel": 2, "Fairy": 0.5},
+            "Poison": {"Grass": 2, "Poison": 0.5, "Ground": 0.5, "Rock": 0.5, "Ghost": 0.5, "Steel": 0, "Fairy": 2},
+            "Ground": {"Fire": 2, "Electric": 2, "Grass": 0.5, "Poison": 2, "Flying": 0, "Bug": 0.5, "Rock": 2, "Steel": 2},
+            "Flying": {"Electric": 0.5, "Grass": 2, "Fighting": 2, "Bug": 2, "Rock": 0.5, "Steel": 0.5},
+            "Psychic": {"Fighting": 2, "Poison": 2, "Psychic": 0.5, "Dark": 0, "Steel": 0.5},
+            "Bug": {"Fire": 0.5, "Grass": 2, "Fighting": 0.5, "Poison": 0.5, "Flying": 0.5, "Psychic": 2, "Ghost": 0.5, "Dark": 2, "Steel": 0.5, "Fairy": 0.5},
+            "Rock": {"Fire": 2, "Ice": 2, "Fighting": 0.5, "Ground": 0.5, "Flying": 2, "Bug": 2, "Steel": 0.5},
+            "Ghost": {"Normal": 0, "Psychic": 2, "Ghost": 2, "Dark": 0.5},
+            "Dragon": {"Dragon": 2, "Steel": 0.5, "Fairy": 0},
+            "Dark": {"Fighting": 0.5, "Psychic": 2, "Ghost": 2, "Dark": 0.5, "Fairy": 0.5},
+            "Steel": {"Fire": 0.5, "Water": 0.5, "Electric": 0.5, "Ice": 2, "Rock": 2, "Steel": 0.5, "Fairy": 2},
+            "Fairy": {"Fire": 0.5, "Fighting": 2, "Poison": 0.5, "Dragon": 2, "Dark": 2, "Steel": 0.5}
+        };
+
+        var multiplier = typeChart["Fire"]["Grass"] * typeChart["Fire"]["Water"]; // to be reformated into Laplush
+
+        function useMove(user, target, move) {
+            if (move.pp <= 0) {
+                console.log("Not enough PP for this move!");
+                return; // Make sure the player sees the message & the player can move again with another move
+            }
+            // Lowers the move's power points by 1
+            move.pp--;
+            // If the move is "Recover", restore 50% of the user's max HP
+            if (move.name === "Recover") {
+                user.hp = Math.min(user.maxHp, user.hp + Math.floor(user.maxHp * 0.5)); // Math.min rounds down here
+            } else {
+                // Apply damage
+                var damage = calculateDamage(user, target, move);
+                target.hp -= damage;
+
+                // Apply stat changes
+                if (move.statChanges) {
+                    // For "Ancient Power", only apply stat changes 10% of the time
+                    if (move.name !== "Ancient Power" || Math.random() < 0.1) {
+                        for (var stat in move.statChanges) {
+                            user.stats[stat] += move.statChanges[stat];
+                        }
+                    }
+                }
+            }
         }
+
+        function calculateDamage(attacker, defender, move) {
+            var baseDamage = move.power;
+            var typeMultiplier = 1.0;
+            for (var i = 0; i < defender.types.length; i++) {
+                typeMultiplier *= typeChart[move.type][defender.types[i]] || 1.0;
+            }
+            // Check for STAB
+            if (attacker.types.includes(move.type)) {
+                typeMultiplier *= 1.5;
+            }
+            // Use special attack and special defense stats
+            return baseDamage * typeMultiplier * attacker.spAtk / defender.spDef;
+        }
+
+
+        // implement power points (pp) for each move
+        // implement accuracy for each move (optional)
+
+        var playerMoveset = [
+            {name: "Calm Mind", type: "Psychic", power: 0, pp: 32, statChanges: {spAtk: 1, spDef: 1}},
+            {name: "Judgement", type: playerType[0], power: 100, pp: 16},
+            {name: "Recover", type: "Normal", power: 0, pp: 16},
+            {name: "Shadow Ball", type: "Ghost", power: 80, pp: 16} // chance to lower spDef
+        ];
+
+        var laplushMoveset = [
+            {name: "Ice Beam", type: "Ice", power: 90, pp: 16}, // frostbite chance
+            {name: "Brine", type: "Water", power: 65, pp: 16}, // double damage when enemy has 50% or less HP
+            {name: "Thunderbolt", type: "Electric", power: 90, pp: 24}, // paralysis chance
+            {name: "Ancient Power", type: "Rock", power: 60, pp: 8, statChanges: {atk: 1, def: 1, spAtk: 1, spDef: 1, speed: 1}}
+        ];
+
+        // console.log('Hello do you hear me?'); // Debugging line
+
+        // the above line runs, meaning the issue is with something inside the battle frame
+
+        // implement crits and abilities
+        
+        // // tagged out code because it doesn't work
+
+        // form.addEventListener('submit', function(event) {
+            
+        //     console.log('Form submitted'); // Should log when form is submitted
+
+        //     // Prevent the form from submitting normally
+        //     event.preventDefault();
+
+        //     // Log the battle frame element
+        //     console.log('Battle frame element:', document.getElementById('battle-frame')); // Debugging line
+
+        //     // Show the battle frame
+        //     document.getElementById('battle-frame').style.display = 'block';
+        //     console.log('Attempting to display battle frame'); // Debugging line
+
+        //     // Get the selected type
+        //     var selectedType = document.getElementById('pokemonType').value;
+        //     console.log('Selected type:', selectedType); // Debugging line
+
+        //     // Set the player's type
+        //     playerType = [selectedType];
+        //     console.log('Player type:', playerType); // Debugging line
+
+        //     // Update the player's moveset
+        //     playerMoveset[1].type = playerType[0];
+        //     console.log('Player moveset:', playerMoveset); // Debugging line
+        // });
     });
-    var playerMoveset = ["Calm Mind", "Judgement", "Recover", "Shadow Ball"];
+
     
-    var LaplushHP = 465;
-    var LaplushAttack = 295;
-    var LaplushDefense = 317;
-    var LaplushSpeed = 240;
-    var LaplushHeldItem = "Leftovers"; 
-    var LaplushType = ["Water", "Ice"]; // might replace with specific weaknesses and strengths instead
-    var LaplushMoveset = ["Ice Beam", "Brine", "Thunderbolt", "Ancient Power"];
-    // <!-- regen 1/16 of max HP per turn -->
-    
-    
-    
-    // <!-- Enemy Laplush moveset: Ice Beam (Higher dmg), Brine (Higher dmg), Thunderbolt, Ancient Power -->
-    // <!-- Enemy Laplush held item: Leftovers -->
-  
-});
 </script>
 
-
 </body>
+</html>
