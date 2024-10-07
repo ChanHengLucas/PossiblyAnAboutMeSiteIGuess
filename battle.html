@@ -492,7 +492,7 @@
                 // Only apply the status effect if the target doesn't have a status effect yet
                 if (target.status === "" && target.type !== 'Ice') {
                     // Apply the frostbite effect with a certain chance
-                    if (Math.random() < 0.99) { // adjust the chance as needed
+                    if (Math.random() < 0.1) { // adjust the chance as needed
                         target.status = 'Frostbite';
                         console.log(target.name + ' is frostbitten!');
                     }
@@ -573,9 +573,7 @@
 
         for (var i = 0; i < player.moveset.length; i++) { // Display moveset buttons, Power Points, and type. 
             var move = player.moveset[i];
-
-            // Get the button element
-            var button = document.getElementById('move' + (i + 1) + '-button');
+            var button = document.getElementById('move' + (i + 1) + '-button'); // the root cause of this problem...
 
             // Set the button's text
             button.textContent = move.name + ' (PP: ' + move.pp + ', Type: ' + move.type + ')';
@@ -588,7 +586,29 @@
                 var playerSpAtk = player.status === 'Frostbite' ? player.baseSpAtk * 0.5 : player.spAtk;
                 var OpponentLaplushSpAtk = OpponentLaplush.status === 'Frostbite' ? OpponentLaplush.baseSpAtk * 0.5 : OpponentLaplush.spAtk;
 
+                var playerHasMovesLeft = player.moveset.some(function(move) {
+                    return move.pp > 0;
+                });
+
+                
+
                 return function() {
+                    // If the move has no PP left, disable the button and return
+                    var playerHasMovesLeft = player.moveset.some(function(move) {
+                        return move.pp > 0;
+                    });
+
+                    // If the player has no moves left with PP > 0, force the player to use "Struggle"
+                    if (!playerHasMovesLeft) {
+                        move = {name: 'Struggle', type: 'Normal', power: 50, pp: Infinity};
+                    }
+
+                    // If the move has no PP left, disable the button and return
+                    if (move.pp <= 0) {
+                        button.disabled = true;
+                        return;
+                    }
+
                     var target;
                     if (move.name === 'Calm Mind' || move.name === 'Recover') {
                         target = player;
@@ -654,6 +674,13 @@
                                     useMove(player, target, move);
                                 }
                             }
+                        }
+                    }
+                    // After handling the move, update the button's text and check if the move has no PP left
+                    function updateButton(move, button) {
+                        button.textContent = move.name + ' (PP: ' + move.pp + ', Type: ' + move.type + ')';
+                        if (move.pp <= 0) {
+                            button.disabled = true;
                         }
                     }
                     if (player.status === 'Frostbite') {
@@ -724,3 +751,5 @@
 <!-- Implement HP bars -->
 <!-- Implement Text Field -->
 <!-- Beautify button UI -->
+<!-- Fix problem with it being Laplush's turn after player misclicks a move that has no PP -->
+
