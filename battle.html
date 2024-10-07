@@ -104,6 +104,8 @@
     <button id="move4-button"></button>
 </div>
 
+<audio id="faint-sound" src="augh.mp3" preload="auto"></audio>
+
 <br><br>
 
 
@@ -356,6 +358,8 @@
             if (OpponentLaplush.hp <= 0) {
                 OpponentLaplush.hp = 0;
                 document.getElementById('laplush').classList.add('fade-out');
+                var sound = document.getElementById('faint-sound');
+                sound.play();
                 var returnButton = document.createElement('button');
                 returnButton.textContent = 'Return to Home Page';
                 returnButton.onclick = function() {
@@ -368,6 +372,8 @@
             if (player.hp <= 0) {
                 player.hp = 0;
                 document.getElementById('player').classList.add('fade-out');
+                var sound = document.getElementById('faint-sound');
+                sound.play();
                 var tryAgainButton = document.createElement('button');
                 tryAgainButton.textContent = 'Try Again';
                 tryAgainButton.onclick = function() {
@@ -675,6 +681,21 @@
                         var frostbiteDamage = Math.floor(player.maxHP / 16);
                         player.hp -= frostbiteDamage;
                         console.log(player.name + ' took ' + frostbiteDamage + ' damage from frostbite!');
+                    }
+
+                    // Check if the player's HP is less than or equal to 0
+                    if (player.hp <= 0 && player.status == 'Frostbite') {
+                        player.hp = 0;
+                        document.getElementById('player-hp').textContent = 'Player HP: ' + player.hp + " | " + player.status;
+                        console.log(player.name + ' has fainted!');
+                        var sound = document.getElementById('faint-sound');
+                        sound.play();
+                        var tryAgainButton = document.createElement('button');
+                        tryAgainButton.textContent = 'Try Again';
+                        tryAgainButton.onclick = function() {
+                            location.reload();
+                        };
+                        document.body.appendChild(tryAgainButton);
                     }
                 };
 
