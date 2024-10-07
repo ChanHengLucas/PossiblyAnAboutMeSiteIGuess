@@ -137,11 +137,14 @@
             maxHP: 444,
             hp: 444,
             spAtk: 372,
+            baseSpAtk: 372,
             spDef: 372,
             speed: 372,
+            baseSpeed: 372,
             spAtkLevel: 0,
             spDefLevel: 0,
             speedLevel: 0,
+            status: ""
         };
 
         // Get the query string from the URL
@@ -159,12 +162,15 @@
             maxHP: 465,
             hp: 465,
             spAtk: 295,
+            baseSpAtk: 295,
             spDef: 317,
             speed: 240,
+            baseSpeed: 240,
             spAtkLevel: 0,
             spDefLevel: 0,
             speedLevel: 0,
             heldItem: "Leftovers",
+            status: ""
         };
 
 
@@ -229,6 +235,10 @@
         // not complete
         var multiplier = typeChart["Fire"]["Grass"] * typeChart["Fire"]["Water"]; // to be reformated into Laplush
 
+        // if (player.status === 'Paralyzed') {
+        //     document.getElementById('hp-bar').innerHTML = 'HP: ' + player.hp + ' (Paralyzed)';
+        // }
+
         function useMove(user, target, move) {
             if (player.hp <= 0 || OpponentLaplush.hp <= 0) {
                 return;
@@ -240,7 +250,10 @@
             // Lowers the move's power points by 1
             move.pp--;
 
-            console.log(user.name + ' used ' + move.name /* + ' on ' + target.name*/ + '!'); // Display battle messages later
+            if (user.name === "Player" || user.name === "Laplush") {
+                console.log(user.name + ' used ' + move.name + '!'); // Display battle messages later
+            }
+            // console.log(user.name + ' used ' + move.name /* + ' on ' + target.name*/ + '!'); // Display battle messages later
 
             // Update the button text to show the remaining PP
             if (user === player) {
@@ -325,13 +338,13 @@
                 if (player.hp <= 0) {
                     player.hp = 0;
                 }
-                document.getElementById('player-hp').textContent = 'Player HP: ' + player.hp;
+                document.getElementById('player-hp').textContent = 'Player HP: ' + player.hp + " | " + player.status;
             } else {
                 OpponentLaplush.hp = Math.floor(OpponentLaplush.hp);
                 if (OpponentLaplush.hp <= 0){
                     OpponentLaplush.hp = 0;
                 }
-                document.getElementById('opponent-hp').textContent = 'Opponent HP: ' + OpponentLaplush.hp;
+                document.getElementById('opponent-hp').textContent = 'Opponent HP: ' + OpponentLaplush.hp + " | " + OpponentLaplush.status;
             }
 
             if (target.hp <= 0) {
@@ -365,7 +378,14 @@
         }
 
         function calculateDamage(attacker, defender, move) {
+            // console.log("Testing");
+            var attackerSpecialAttack = attacker.status === 'Frostbite' ? attacker.baseSpAtk * 0.5 : attacker.spAtk;
+            if (attackerSpecialAttack == undefined) {
+                attackerSpecialAttack = attacker.spAtk;
+            }
             var baseDamage = move.power;
+            // console.log(baseDamage);
+            // console.log(attackerSpecialAttack);
             var typeMultiplier = 1.0;
             // Use move.type instead of type
             var moveType = move.type.charAt(0).toUpperCase() + move.type.slice(1);
@@ -377,8 +397,9 @@
                 typeMultiplier *= 1.5;
             }
             // Use special attack and special defense stats, multiplied by their respective stat multipliers
-            if (move.name != 'Struggle') {
-                var damage = baseDamage * typeMultiplier * (attacker.spAtk * statMulti[attacker.spAtkLevel]) / (defender.spDef * statMulti[defender.spDefLevel]);
+            if (move.name != "Struggle") {
+                var damage = baseDamage * typeMultiplier * (attackerSpecialAttack * statMulti[attacker.spAtkLevel]) / (defender.spDef * statMulti[defender.spDefLevel]);
+                // console.log("Damage: " + damage);
             } else {
                 var damage = baseDamage * typeMultiplier;
             }
@@ -442,7 +463,7 @@
                     user.hp = Math.floor(user.hp + user.maxHP * 0.5);
                 }
                 console.log(user.name + " used Recover and restored its HP!");
-                console.log(user.name + "'s HP is now " + user.hp);
+                // console.log(user.name + "'s HP is now " + user.hp);
             }
         },
             {
@@ -462,7 +483,22 @@
         ];
 
         OpponentLaplush.moveset = [
-            {name: "Ice Beam", type: "Ice", power: 90, pp: 16}, // frostbite chance
+        {
+            name: "Ice Beam",
+            type: "Ice",
+            power: 90,
+            pp: 16,
+            effect: function(user, target) {
+                // Only apply the status effect if the target doesn't have a status effect yet
+                if (target.status === "" && target.type !== 'Ice') {
+                    // Apply the frostbite effect with a certain chance
+                    if (Math.random() < 0.99) { // adjust the chance as needed
+                        target.status = 'Frostbite';
+                        console.log(target.name + ' is frostbitten!');
+                    }
+                }
+            }
+        },
             {
                 name: "Brine",
                 type: "Water",
@@ -475,7 +511,27 @@
                     }
                 }
             }, // double damage when enemy has 50% or less HP
-            {name: "Thunderbolt", type: "Electric", power: 90, pp: 24}, // paralysis chance
+            {
+                name: "Thunderbolt",
+                type: "Electric",
+                power: 90,
+                pp: 24,
+                effect: function(user, target) {
+                    // Only apply the status effect if the target doesn't have a status effect yet and isn't of Electric type
+                    if (target.status === "" && target.type !== 'Electric') {
+                        // Apply the paralysis effect with a 10% chance
+                        if (Math.random() < 0.1) {
+                            target.status = 'Paralyzed';
+                            console.log(target.name + ' is paralyzed!');
+                            if (target === player) {
+                                document.getElementById('player-hp').innerHTML = 'HP: ' + target.hp + " | " + target.status;
+                            } else {
+                                document.getElementById('opponent-hp').innerHTML = 'HP: ' + target.hp + " | " + target.status;
+                            }
+                        }
+                    }
+                }
+            },
             {
                 name: "Ancient Power", 
                 type: "Rock", 
@@ -496,7 +552,7 @@
         ];
 
 
-        console.log('Player type is now ' + player.type);
+        // console.log('Player type is now ' + player.type);
 
         // Get a random move from the opponent's moveset
         function getLaplushMove() {
@@ -527,6 +583,11 @@
             // Add an event listener for the click event
 
             button.addEventListener('click', (function(move) {
+                var playerSpeed = player.status === 'Paralyzed' ? player.baseSpeed * 0.5 : player.speed;
+                var OpponentLaplushSpeed = OpponentLaplush.status === 'Paralyzed' ? OpponentLaplush.baseSpeed * 0.5 : OpponentLaplush.speed;
+                var playerSpAtk = player.status === 'Frostbite' ? player.baseSpAtk * 0.5 : player.spAtk;
+                var OpponentLaplushSpAtk = OpponentLaplush.status === 'Frostbite' ? OpponentLaplush.baseSpAtk * 0.5 : OpponentLaplush.spAtk;
+
                 return function() {
                     var target;
                     if (move.name === 'Calm Mind' || move.name === 'Recover') {
@@ -536,29 +597,43 @@
                     }
 
                     // Determine the order of moves based on speed
-                    if (player.speed > OpponentLaplush.speed) {
+                    if (playerSpeed > OpponentLaplushSpeed) {
                         // Player moves first
-                        useMove(player, target, move);
-
+                        if (player.status === 'Paralyzed' && Math.random() < 0.5) {
+                            console.log(player.name + ' is paralyzed and can\'t move!');
+                            // return;
+                        } else {
+                            useMove(player, target, move);
+                        }
                         // Then Laplush moves
                         if (OpponentLaplush.hp > 0) {
                             var laplushMove = getLaplushMove();
                             useMove(OpponentLaplush, player, laplushMove);
                         }
-                    } else if (player.speed < OpponentLaplush.speed) {
+                    } else if (playerSpeed < OpponentLaplushSpeed) {
                         // Laplush moves first
                         var laplushMove = getLaplushMove();
                         useMove(OpponentLaplush, player, laplushMove);
 
                         // Then player moves
                         if (player.hp > 0) {
-                            useMove(player, target, move);
+                            if (player.status === 'Paralyzed' && Math.random() < 0.5) {
+                                console.log(player.name + ' is paralyzed and can\'t move!');
+                                // return;
+                            } else {
+                                useMove(player, target, move);
+                            }
                         }
                     } else {
                         // If their speed is equal, select the first mover randomly
                         if (Math.random() < 0.5) {
                             // Player moves first
-                            useMove(player, target, move);
+                            if (player.status === 'Paralyzed' && Math.random() < 0.5) {
+                                console.log(player.name + ' is paralyzed and can\'t move!');
+                                // return;
+                            } else {
+                                useMove(player, target, move);
+                            }
 
                             // Then Laplush moves
                             if (OpponentLaplush.hp > 0) {
@@ -572,9 +647,19 @@
 
                             // Then player moves
                             if (player.hp > 0) {
-                                useMove(player, target, move);
+                                if (player.status === 'Paralyzed' && Math.random() < 0.5) {
+                                    console.log(player.name + ' is paralyzed and can\'t move!');
+                                    // return;
+                                } else {
+                                    useMove(player, target, move);
+                                }
                             }
                         }
+                    }
+                    if (player.status === 'Frostbite') {
+                        var frostbiteDamage = Math.floor(player.maxHP / 16);
+                        player.hp -= frostbiteDamage;
+                        console.log(player.name + ' took ' + frostbiteDamage + ' damage from frostbite!');
                     }
                     // Log the updated stats of the player and the opponent Laplush
                     // console.log("Player spAtk:" + player.spAtkLevel);
@@ -621,10 +706,10 @@
 
         window.onload = function() {
             // Display the initial HP of the player
-            document.getElementById('player-hp').textContent = 'Player HP: ' + player.hp;
+            document.getElementById('player-hp').textContent = 'Player HP: ' + player.hp + " | " + player.status;
 
             // Display the initial HP of the opponent Laplush
-            document.getElementById('opponent-hp').textContent = 'Opponent HP: ' + OpponentLaplush.hp;
+            document.getElementById('opponent-hp').textContent = 'Opponent HP: ' + OpponentLaplush.hp + " | " + OpponentLaplush.status;
         };
 
     });
@@ -634,15 +719,8 @@
 </html>
 
 <!-- To Do List: -->
-<!-- Fix PP running out making your opponent move -->
-<!-- Make sure PP applies to opponent -->
-<!-- Implement struggle -->
+<!-- Implement struggle for player -->
 <!-- Implement leftovers for Laplush -->
-<!-- Implement frostbite and paralysis -->
-<!-- Ice types are immune to frostbite and electric types are immune to paralysis -->
 <!-- Implement HP bars -->
-<!-- Implement PP on buttons -->
 <!-- Implement Text Field -->
 <!-- Beautify button UI -->
-<!-- Add health bar -->
-<!-- Display status effects if needed -->
