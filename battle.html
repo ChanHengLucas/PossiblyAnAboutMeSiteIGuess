@@ -50,10 +50,8 @@
     }
 
     #battle-frame {
-        display: none;
         width: 1000px;
         height: 550px;
-        /* border: 2px solid black; */
         position: relative;
         margin: auto;
         background-image: url('Water Background Pokemon.png'); /* Replace with your background image */
@@ -77,39 +75,33 @@
         height: 270px; /* Adjust as needed */
     }
 
+    #moveset-container {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+    }
+
+    .fade-out {
+        transition: opacity 2s ease-in-out;
+        opacity: 0;
+    }
+
 </style>
 
 <body>
- 
-<form id="typeForm">    
-    <label id="typeLabel" for="pokemonType">Choose a Pokémon Type:</label><br><br>
-    <select id="pokemonType" name="pokemonType">
-        <option value="normal">Normal</option>
-        <option value="fire">Fire</option>
-        <option value="water">Water</option>
-        <option value="grass">Grass</option>
-        <option value="electric">Electric</option>
-        <option value="psychic">Psychic</option>
-        <option value="fighting">Fighting</option>
-        <option value="flying">Flying</option>
-        <option value="poison">Poison</option>
-        <option value="ground">Ground</option>
-        <option value="rock">Rock</option>
-        <option value="bug">Bug</option>
-        <option value="ghost">Ghost</option>
-        <option value="steel">Steel</option>
-        <option value="ice">Ice</option>
-        <option value="dragon">Dragon</option>
-        <option value="dark">Dark</option>
-        <option value="fairy">Fairy</option>
-    </select>
-    <br><br>
-    <input type="submit" id="submit" value="Submit">
-</form>
 
-<div id="battle-frame" style="display: none;">
-    <img id="player" class="pokemon" src="The Player.png"> <!-- Replace with your player's image -->
-    <img id="laplush" class="pokemon" src="LaplushBattle.png"> <!-- Replace with Laplush's image -->
+<div id="player-hp"></div>
+<div id="opponent-hp"></div>
+<div id="battle-frame">
+    <img id="player" class="pokemon" src="The Player.png">
+    <img id="laplush" class="pokemon" src="LaplushBattle.png">
+</div>
+
+<div id="moveset-container">
+    <button id="move1-button"></button>
+    <button id="move2-button"></button>
+    <button id="move3-button"></button>
+    <button id="move4-button"></button>
 </div>
 
 
@@ -119,51 +111,70 @@
     <!-- Player held item: Plate (Depending on type)-->
 <script>
     document.addEventListener('DOMContentLoaded', function() {   
-        var form = document.getElementById('typeForm');
+        // var form = document.getElementById('typeForm');
         var battleFrame = document.getElementById('battle-frame');
-        var playerPokemonType = document.getElementById('pokemonType');
+        // var playerPokemonType = document.getElementById('pokemonType');
 
-        // debug lines
-        console.log(form); // Should log the form element
-        console.log(battleFrame); // Should log the battle frame element
-        console.log(pokemonType); // Should log the select element
+        // // debug lines
+        // console.log(form); // Should log the form element
+        // console.log(battleFrame); // Should log the battle frame element
+        // console.log(pokemonType); // Should log the select element
 
-        var playerHP = 444;
-        var playerSpAtk = 372;
-        var playerSpDef = 372;
-        var playerSpeed = 372;
-        var playerType = ["Normal"]; // default type
-        // <!-- Change playerType depending on player input -->
-        document.getElementById('submit').addEventListener('click', function(event) {
-            // Prevent the form from being submitted
-            event.preventDefault();
+        // var playerHP = 444;
+        // var playerSpAtk = 372;
+        // var playerSpDef = 372;
+        // var playerSpeed = 372;
+        // var playerSpAtkLevel = 0;
+        // var playerSpDefLevel = 0;
+        // var playerSpeedLevel = 0;
 
-            // Get the value of the input field
-            var inputType = document.getElementById('pokemonType').value;
+        var player = {
+            // type: document.getElementById('pokemonType').value,
+            name: "Player",
+            type: "Normal",
+            maxHP: 444,
+            hp: 444,
+            spAtk: 372,
+            spDef: 372,
+            speed: 372,
+            spAtkLevel: 0,
+            spDefLevel: 0,
+            speedLevel: 0,
+        };
 
-            // Check if the input is not empty
-            if (inputType) {
-                // Set playerType to the input value
-                playerType[0] = inputType;
-                console.log('Player type is now: ' + playerType[0]);
+        // Get the query string from the URL
+        var queryString = window.location.search;
 
-                // Hide the select menu
-                document.getElementById('pokemonType').style.display = 'none';
-                document.getElementById('typeLabel').style.display = 'none';
-                document.getElementById('submit').style.display = 'none';
+        // Use the URLSearchParams API to parse the query string
+        var urlParams = new URLSearchParams(queryString);
 
-                // Show the battle frame
-                document.getElementById('battle-frame').style.display = 'block';
-            }
-        });
-        // var playerMoveset = ["Calm Mind", "Judgement", "Recover", "Shadow Ball"];
+        // Get the player type from the query string
+        player.type = urlParams.get('type');
 
-        var LaplushHP = 465;
-        var LaplushSpAtk = 295;
-        var LaplushSpDef = 317;
-        var LaplushSpeed = 240;
-        var LaplushHeldItem = "Leftovers"; 
-        var LaplushType = ["Water", "Ice"]; // might replace with specific weaknesses and strengths instead
+        var OpponentLaplush = {
+            name: "Laplush",
+            type: ["Water", "Ice"],
+            maxHP: 465,
+            hp: 465,
+            spAtk: 295,
+            spDef: 317,
+            speed: 240,
+            spAtkLevel: 0,
+            spDefLevel: 0,
+            speedLevel: 0,
+            heldItem: "Leftovers",
+        };
+
+
+        // var LaplushHP = 465;
+        // var LaplushSpAtk = 295;
+        // var LaplushSpDef = 317;
+        // var LaplushSpeed = 240;
+        // var LaplushSpAtkLevel = 0;
+        // var LaplushSpDefLevel = 0;
+        // var LaplushSpeedLevel = 0;
+        // var LaplushHeldItem = "Leftovers"; 
+        // var LaplushType = ["Water", "Ice"]; // might replace with specific weaknesses and strengths instead
         // var LaplushMoveset = ["Ice Beam", "Brine", "Thunderbolt", "Ancient Power"];
         // <!-- regen 1/16 of max HP per turn -->
         
@@ -197,105 +208,326 @@
             "Fairy": {"Fire": 0.5, "Fighting": 2, "Poison": 0.5, "Dragon": 2, "Dark": 2, "Steel": 0.5}
         };
 
+        var statMulti = {
+            '-6': 0.25,
+            '-5': 1/7,
+            '-4': 1/3,
+            '-3': 0.4,
+            '-2': 0.5,
+            '-1': 2/3,
+            '0': 1,
+            '1': 1.5,
+            '2': 2,
+            '3': 2.5,
+            '4': 3,
+            '5': 3.5,
+            '6': 4
+        };
+
+        // not complete
         var multiplier = typeChart["Fire"]["Grass"] * typeChart["Fire"]["Water"]; // to be reformated into Laplush
 
         function useMove(user, target, move) {
+            //  // Check if user, target, and move are defined (debug)
+            // if (!user || !target || !move) {
+            //     console.error('One or more arguments are undefined:', { user, target, move });
+            //     return;
+            // }
+
+            // // Check if user.name, target.name, and move.name are defined (debug)
+            // if (!user.name || !target.name || !move.name) {
+            //     console.error('One or more name properties are undefined:', { user, target, move });
+            //     return;
+            // }
+            
+            console.log(user.name + ' used ' + move.name /* + ' on ' + target.name*/ + '!'); // Display battle messages later
             if (move.pp <= 0) {
                 console.log("Not enough PP for this move!");
                 return; // Make sure the player sees the message & the player can move again with another move
             }
             // Lowers the move's power points by 1
             move.pp--;
-            // If the move is "Recover", restore 50% of the user's max HP
-            if (move.name === "Recover") {
-                user.hp = Math.min(user.maxHp, user.hp + Math.floor(user.maxHp * 0.5)); // Math.min rounds down here
-            } else {
-                // Apply damage
-                var damage = calculateDamage(user, target, move);
-                target.hp -= damage;
 
-                // Apply stat changes
-                if (move.statChanges) {
-                    // For "Ancient Power", only apply stat changes 10% of the time
-                    if (move.name !== "Ancient Power" || Math.random() < 0.1) {
-                        for (var stat in move.statChanges) {
-                            user.stats[stat] += move.statChanges[stat];
-                        }
-                    }
+            var userType = Array.isArray(user.type) ? user.type : [user.type];
+            var targetType = Array.isArray(target.type) ? target.type : [target.type];
+
+            var typeMultiplier = 1.0;
+            for (var i = 0; i < userType.length; i++) {
+                for (var j = 0; j < targetType.length; j++) {
+                    var userKey = userType[i].charAt(0).toUpperCase() + userType[i].slice(1);
+                    var targetKey = targetType[j].charAt(0).toUpperCase() + targetType[j].slice(1);
+                    // if (!typeChart[userKey]) {
+                    //     console.log('typeChart does not have property', userKey);
+                    // } else if (!typeChart[userKey][targetKey]) {
+                    //     console.log('typeChart[' + userKey + '] does not have property', targetKey);
+                    // }
+                    typeMultiplier *= typeChart[userKey][targetKey] || 1.0;
                 }
+            }
+
+            // If the move deals damage, apply it
+            
+            if (move.power > 0) {
+                var damage = calculateDamage(user, target, move);
+                damage *= typeMultiplier;
+                target.hp -= damage;
+                // Check the type multiplier and display the appropriate message
+                if (typeMultiplier < 1) {
+                    console.log("It's not very effective...");
+                } else if (typeMultiplier > 1) {
+                    console.log("It's super effective!");
+                }
+                console.log("It did " + damage + " damage!");
+            }
+  
+            // If the move has an effect, apply it
+            if (move.effect) {
+                move.effect(user, target);
+            }
+
+            // Update the HP display
+            if (target === player) {
+                player.hp = Math.floor(player.hp);
+                document.getElementById('player-hp').textContent = 'Player HP: ' + player.hp;
+            } else {
+                OpponentLaplush.hp = Math.floor(OpponentLaplush.hp);
+                document.getElementById('opponent-hp').textContent = 'Opponent HP: ' + OpponentLaplush.hp;
+            }
+
+            if (target.hp <= 0) {
+                target.hp = 0;
+                console.log(target.name + " has fainted!");
+                // document.getElementById('target').classList.add('fade-out'); // replace 'player' with the actual ID
+            }
+
+            if (OpponentLaplush.hp <= 0) {
+                document.getElementById('laplush').classList.add('fade-out');
+                var returnButton = document.createElement('button');
+                returnButton.textContent = 'Return to Home Page';
+                returnButton.onclick = function() {
+                    window.location.href = 'index.html';
+                };
+                document.body.appendChild(returnButton);
+                // document.getElementById('OpponentLaplush-element').classList.add('fade-out'); // replace 'OpponentLaplush-element' with the actual ID
+            }
+
+            if (player.hp <= 0) {
+                document.getElementById('player').classList.add('fade-out');
+                var tryAgainButton = document.createElement('button');
+                tryAgainButton.textContent = 'Try Again';
+                tryAgainButton.onclick = function() {
+                    location.reload();
+                };
+                document.body.appendChild(tryAgainButton);
             }
         }
 
         function calculateDamage(attacker, defender, move) {
             var baseDamage = move.power;
             var typeMultiplier = 1.0;
-            for (var i = 0; i < defender.types.length; i++) {
-                typeMultiplier *= typeChart[move.type][defender.types[i]] || 1.0;
+            // Use move.type instead of type
+            var moveType = move.type.charAt(0).toUpperCase() + move.type.slice(1);
+            for (var i = 0; i < defender.type.length; i++) {
+                typeMultiplier *= typeChart[moveType][defender.type[i]] || 1.0;
             }
             // Check for STAB
-            if (attacker.types.includes(move.type)) {
+            if (attacker.type.includes(move.type)) {
                 typeMultiplier *= 1.5;
             }
-            // Use special attack and special defense stats
-            return baseDamage * typeMultiplier * attacker.spAtk / defender.spDef;
+            // Use special attack and special defense stats, multiplied by their respective stat multipliers
+            var damage = baseDamage * typeMultiplier * (attacker.spAtk * statMulti[attacker.spAtkLevel]) / (defender.spDef * statMulti[defender.spDefLevel]);
+            // Round down the damage
+            damage = Math.floor(damage);
+            return damage;
         }
 
-
-        // implement power points (pp) for each move
-        // implement accuracy for each move (optional)
-
-        var playerMoveset = [
-            {name: "Calm Mind", type: "Psychic", power: 0, pp: 32, statChanges: {spAtk: 1, spDef: 1}},
-            {name: "Judgement", type: playerType[0], power: 100, pp: 16},
-            {name: "Recover", type: "Normal", power: 0, pp: 16},
-            {name: "Shadow Ball", type: "Ghost", power: 80, pp: 16} // chance to lower spDef
+        player.moveset = [
+        {
+            name: "Calm Mind", 
+            type: "Psychic", 
+            power: 0, 
+            pp: 32, 
+            effect: function(user) {
+                user.spAtkLevel += 1;
+                user.spDefLevel += 1;
+                console.log("Calm Mind raised the user's spAtk and spDef!"); // Display battle messages later in a textfield
+            }
+        },
+        {
+            name: "Judgement", 
+            type: player.type.charAt(0).toUpperCase() + player.type.slice(1), 
+            power: 100, 
+            pp: 16
+        },
+        {
+            name: "Recover",
+            type: "Normal",
+            power: 0,
+            pp: 16,
+            effect: function(user) {
+                // Ensure user.maxHP is defined and is a number
+                user.maxHP = (typeof user.maxHP === 'number' && !isNaN(user.maxHP)) ? user.maxHP : 100;
+                // Ensure user.hp is defined and is a number
+                user.hp = (typeof user.hp === 'number' && !isNaN(user.hp)) ? user.hp : 0;
+                // If user's HP is half or more, max it out
+                if (user.hp >= user.maxHP / 2) {
+                    user.hp = user.maxHP;
+                } else {
+                    // Otherwise, replenish user's HP by 50% (rounded down)
+                    user.hp = Math.floor(user.hp + user.maxHP * 0.5);
+                }
+                console.log(user.name + " used Recover and restored its HP!");
+                console.log(user.name + "'s HP is now " + user.hp);
+            }
+        },
+            {
+                name: "Shadow Ball", 
+                type: "Ghost", 
+                power: 80, 
+                pp: 16,
+                effect: function(user, target) {
+                    // 20% chance to lower spDef
+                    if (Math.random() < 0.2) {
+                        target.spDefLevel -= 1;
+                        // console.log("Shadow Ball lowered the opponent's spDef!"); // Display battle messages later
+                        console.log(target.name + "'s Special Defense fell!");
+                    }
+                }
+            }
         ];
 
-        var laplushMoveset = [
+        OpponentLaplush.moveset = [
             {name: "Ice Beam", type: "Ice", power: 90, pp: 16}, // frostbite chance
             {name: "Brine", type: "Water", power: 65, pp: 16}, // double damage when enemy has 50% or less HP
             {name: "Thunderbolt", type: "Electric", power: 90, pp: 24}, // paralysis chance
-            {name: "Ancient Power", type: "Rock", power: 60, pp: 8, statChanges: {atk: 1, def: 1, spAtk: 1, spDef: 1, speed: 1}}
+            {
+                name: "Ancient Power", 
+                type: "Rock", 
+                power: 60, 
+                pp: 8, 
+                effect: function(user) {
+                    // Only apply stat changes 10% of the time
+                    if (Math.random() < 0.1) {
+                        // user.stats.atk += 1; // unused
+                        // user.stats.def += 1; // unused
+                        user.spAtkLevel += 1;
+                        user.spDefLevel += 1;
+                        user.speedLevel += 1;
+                        console.log("Ancient Power raised all the user's stats!"); // Display battle messages later
+                    }
+                }
+            }
         ];
 
-        // console.log('Hello do you hear me?'); // Debugging line
 
-        // the above line runs, meaning the issue is with something inside the battle frame
+        console.log('Player type is now ' + player.type);
 
-        // implement crits and abilities
+        // Get a random move from the opponent's moveset
+        function getLaplushMove() {
+            var randomIndex = Math.floor(Math.random() * OpponentLaplush.moveset.length);
+            return OpponentLaplush.moveset[randomIndex];
+        }
+
+
+        for (var i = 0; i < player.moveset.length; i++) { // Display moveset buttons, Power Points, and type. 
+            var move = player.moveset[i];
+
+            // Get the button element
+            var button = document.getElementById('move' + (i + 1) + '-button');
+
+            // Set the button's text
+            button.textContent = move.name + ' (PP: ' + move.pp + ', Type: ' + move.type + ')';
+
+            // Add an event listener for the click event
+
+            button.addEventListener('click', (function(move) {
+                return function() {
+                    var target;
+                    if (move.name === 'Calm Mind' || move.name === 'Recover') {
+                        target = player;
+                    } else {
+                        target = OpponentLaplush;
+                    }
+
+                    // Determine the order of moves based on speed
+                    if (player.speed > OpponentLaplush.speed) {
+                        // Player moves first
+                        useMove(player, target, move);
+
+                        // Then Laplush moves
+                        if (OpponentLaplush.hp > 0) {
+                            var laplushMove = getLaplushMove();
+                            useMove(OpponentLaplush, player, laplushMove);
+                        }
+                    } else if (player.speed < OpponentLaplush.speed) {
+                        // Laplush moves first
+                        var laplushMove = getLaplushMove();
+                        useMove(OpponentLaplush, player, laplushMove);
+
+                        // Then player moves
+                        if (player.hp > 0) {
+                            useMove(player, target, move);
+                        }
+                    } else {
+                        // If their speed is equal, select the first mover randomly
+                        if (Math.random() < 0.5) {
+                            // Player moves first
+                            useMove(player, target, move);
+
+                            // Then Laplush moves
+                            if (OpponentLaplush.hp > 0) {
+                                var laplushMove = getLaplushMove();
+                                useMove(OpponentLaplush, player, laplushMove);
+                            }
+                        } else {
+                            // Laplush moves first
+                            var laplushMove = getLaplushMove();
+                            useMove(OpponentLaplush, player, laplushMove);
+
+                            // Then player moves
+                            if (player.hp > 0) {
+                                useMove(player, target, move);
+                            }
+                        }
+                    }
+                    // Log the updated stats of the player and the opponent Laplush
+                    console.log("Player spAtk:" + player.spAtkLevel);
+                    console.log("Player spDef:" + player.spDefLevel);
+                    console.log("Player speed:" + player.speedLevel);
+                    console.log("Laplush spAtk:" + OpponentLaplush.spAtkLevel);
+                    console.log("Laplush spDef:" + OpponentLaplush.spDefLevel);
+                    console.log("Laplush speed:" + OpponentLaplush.speedLevel);
+                };
+            })(move));
+
+
         
-        // // tagged out code because it doesn't work
+        }
 
-        // form.addEventListener('submit', function(event) {
-            
-        //     console.log('Form submitted'); // Should log when form is submitted
+        window.onload = function() {
+            // Display the initial HP of the player
+            document.getElementById('player-hp').textContent = 'Player HP: ' + player.hp;
 
-        //     // Prevent the form from submitting normally
-        //     event.preventDefault();
+            // Display the initial HP of the opponent Laplush
+            document.getElementById('opponent-hp').textContent = 'Opponent HP: ' + OpponentLaplush.hp;
+        };
 
-        //     // Log the battle frame element
-        //     console.log('Battle frame element:', document.getElementById('battle-frame')); // Debugging line
-
-        //     // Show the battle frame
-        //     document.getElementById('battle-frame').style.display = 'block';
-        //     console.log('Attempting to display battle frame'); // Debugging line
-
-        //     // Get the selected type
-        //     var selectedType = document.getElementById('pokemonType').value;
-        //     console.log('Selected type:', selectedType); // Debugging line
-
-        //     // Set the player's type
-        //     playerType = [selectedType];
-        //     console.log('Player type:', playerType); // Debugging line
-
-        //     // Update the player's moveset
-        //     playerMoveset[1].type = playerType[0];
-        //     console.log('Player moveset:', playerMoveset); // Debugging line
-        // });
     });
-
-    
 </script>
 
 </body>
 </html>
+
+<!-- To Do List: -->
+<!-- Fix PP running out making your opponent move -->
+<!-- Make sure PP applies to opponent -->
+<!-- Implement struggle -->
+<!-- Implement leftovers for Laplush -->
+<!-- Implement frostbite and paralysis -->
+<!-- Ice types are immune to frostbite and electric types are immune to paralysis -->
+<!-- Implement HP bars -->
+<!-- Implement PP on buttons -->
+<!-- Implement Text Field -->
+<!-- Beautify button UI -->
+<!-- Add health bar -->
+<!-- Display status effects if needed -->

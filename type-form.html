@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Pokemon Type</title>
+
+    <link rel="stylesheet" type="text/css" href="styles.css">
+
+    <link rel="icon" href="laplush.png">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<style>
+    body { 
+        background: linear-gradient(to right, #00cecb, #511eeb);
+        font-family: 'Arial';
+        /* animation: gradient 5s linear infinite; */
+        background-size: 120% 120%;
+    }
+
+    @keyframes keyword{
+        0% {color: rgb(191, 0, 0);}
+        50% {color: rgb(191, 121, 0);}
+        100% {color: rgb(191, 0, 0);}
+    }
+
+    .keyword {
+        animation: keyword 2s linear infinite;
+    }
+</style>
+
+<body>
+    <form id="typeForm">    
+        <label id="typeLabel" for="pokemonType">Choose a Pokémon Type:</label><br><br>
+        <select id="pokemonType" name="pokemonType">
+            <option value="Normal">Normal</option>
+            <option value="Fire">Fire</option>
+            <option value="Water">Water</option>
+            <option value="Grass">Grass</option>
+            <option value="Electric">Electric</option>
+            <option value="Psychic">Psychic</option>
+            <option value="Fighting">Fighting</option>
+            <option value="Flying">Flying</option>
+            <option value="Poison">Poison</option>
+            <option value="Ground">Ground</option>
+            <option value="Rock">Rock</option>
+            <option value="Bug">Bug</option>
+            <option value="Ghost">Ghost</option>
+            <option value="Steel">Steel</option>
+            <option value="Ice">Ice</option>
+            <option value="Dragon">Dragon</option>
+            <option value="Dark">Dark</option>
+            <option value="Fairy">Fairy</option>
+        </select>
+        <br><br>
+        <input type="submit" id="submit" value="Submit">
+    </form>
+
+    <script>
+        var form = document.getElementById('typeForm');
+
+        form.addEventListener('submit', function(event) {
+            // Prevent the form from submitting normally
+            event.preventDefault();
+
+            // Get the value of the input field
+            var inputType = document.getElementById('pokemonType').value;
+
+            // Check if the input is not empty
+            if (inputType) {
+                console.log('Player type is now: ' + inputType);
+
+                // Redirect to the battle page with the player type in the query string
+                window.location.href = 'battle.html?type=' + encodeURIComponent(inputType);
+            }
+        });
+    </script>
+</body>
+</html>
