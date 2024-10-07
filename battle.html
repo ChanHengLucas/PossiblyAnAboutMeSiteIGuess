@@ -570,30 +570,21 @@
 
         }
 
-
-        for (var i = 0; i < player.moveset.length; i++) { // Display moveset buttons, Power Points, and type. 
-            var move = player.moveset[i];
-            var button = document.getElementById('move' + (i + 1) + '-button'); // the root cause of this problem...
+        for (var i = 0; i < player.moveset.length; i++) { 
+            let move = player.moveset[i];  // Use let to create a new scope for each iteration
+            let button = document.getElementById('move' + (i + 1) + '-button'); // Also use let for button
 
             // Set the button's text
             button.textContent = move.name + ' (PP: ' + move.pp + ', Type: ' + move.type + ')';
 
             // Add an event listener for the click event
-
-            button.addEventListener('click', (function(move) {
-                var playerSpeed = player.status === 'Paralyzed' ? player.baseSpeed * 0.5 : player.speed;
-                var OpponentLaplushSpeed = OpponentLaplush.status === 'Paralyzed' ? OpponentLaplush.baseSpeed * 0.5 : OpponentLaplush.speed;
-                var playerSpAtk = player.status === 'Frostbite' ? player.baseSpAtk * 0.5 : player.spAtk;
-                var OpponentLaplushSpAtk = OpponentLaplush.status === 'Frostbite' ? OpponentLaplush.baseSpAtk * 0.5 : OpponentLaplush.spAtk;
-
-                var playerHasMovesLeft = player.moveset.some(function(move) {
-                    return move.pp > 0;
-                });
-
-                
-
+            button.addEventListener('click', (function(move, button) {
                 return function() {
-                    // If the move has no PP left, disable the button and return
+                    var playerSpeed = player.status === 'Paralyzed' ? player.baseSpeed * 0.5 : player.speed;
+                    var OpponentLaplushSpeed = OpponentLaplush.status === 'Paralyzed' ? OpponentLaplush.baseSpeed * 0.5 : OpponentLaplush.speed;
+                    var playerSpAtk = player.status === 'Frostbite' ? player.baseSpAtk * 0.5 : player.spAtk;
+                    var OpponentLaplushSpAtk = OpponentLaplush.status === 'Frostbite' ? OpponentLaplush.baseSpAtk * 0.5 : OpponentLaplush.spAtk;
+
                     var playerHasMovesLeft = player.moveset.some(function(move) {
                         return move.pp > 0;
                     });
@@ -621,7 +612,7 @@
                         // Player moves first
                         if (player.status === 'Paralyzed' && Math.random() < 0.5) {
                             console.log(player.name + ' is paralyzed and can\'t move!');
-                            // return;
+                            return;
                         } else {
                             useMove(player, target, move);
                         }
@@ -639,7 +630,7 @@
                         if (player.hp > 0) {
                             if (player.status === 'Paralyzed' && Math.random() < 0.5) {
                                 console.log(player.name + ' is paralyzed and can\'t move!');
-                                // return;
+                                return;
                             } else {
                                 useMove(player, target, move);
                             }
@@ -650,7 +641,7 @@
                             // Player moves first
                             if (player.status === 'Paralyzed' && Math.random() < 0.5) {
                                 console.log(player.name + ' is paralyzed and can\'t move!');
-                                // return;
+                                return;
                             } else {
                                 useMove(player, target, move);
                             }
@@ -669,38 +660,33 @@
                             if (player.hp > 0) {
                                 if (player.status === 'Paralyzed' && Math.random() < 0.5) {
                                     console.log(player.name + ' is paralyzed and can\'t move!');
-                                    // return;
+                                    return;
                                 } else {
                                     useMove(player, target, move);
                                 }
                             }
                         }
                     }
+
                     // After handling the move, update the button's text and check if the move has no PP left
-                    function updateButton(move, button) {
-                        button.textContent = move.name + ' (PP: ' + move.pp + ', Type: ' + move.type + ')';
-                        if (move.pp <= 0) {
-                            button.disabled = true;
-                        }
-                    }
+                    updateButton(move, button);
+
                     if (player.status === 'Frostbite') {
                         var frostbiteDamage = Math.floor(player.maxHP / 16);
                         player.hp -= frostbiteDamage;
                         console.log(player.name + ' took ' + frostbiteDamage + ' damage from frostbite!');
                     }
-                    // Log the updated stats of the player and the opponent Laplush
-                    // console.log("Player spAtk:" + player.spAtkLevel);
-                    // console.log("Player spDef:" + player.spDefLevel);
-                    // console.log("Player speed:" + player.speedLevel);
-                    // console.log("Laplush spAtk:" + OpponentLaplush.spAtkLevel);
-                    // console.log("Laplush spDef:" + OpponentLaplush.spDefLevel);
-                    // console.log("Laplush speed:" + OpponentLaplush.speedLevel);
                 };
-            })(move));
 
-
-        
-        }
+                // Function to update button state
+                function updateButton(move, button) {
+                    button.textContent = move.name + ' (PP: ' + move.pp + ', Type: ' + move.type + ')';
+                    if (move.pp <= 0) {
+                        button.disabled = true;
+                    }
+                }
+            })(move, button)); // Pass both move and button into the closure
+        };
 
         // Get the move buttons by their unique IDs
         var moveButton1 = document.getElementById('move1-button');
@@ -751,5 +737,5 @@
 <!-- Implement HP bars -->
 <!-- Implement Text Field -->
 <!-- Beautify button UI -->
-<!-- Fix problem with it being Laplush's turn after player misclicks a move that has no PP -->
+<!-- PROBABLY SOLVED: Fix problem with it being Laplush's turn after player misclicks a move that has no PP -->
 
