@@ -104,6 +104,8 @@
     <button id="move4-button"></button>
 </div>
 
+<br><br>
+
 
     <!-- HP bar, enemy HP bar, attack (special), defend (special), attack boost, defense boost, speed, -->
     <!-- Player moveset is determined by chosen type??? -->
@@ -270,6 +272,9 @@
             if (move.power > 0) {
                 var damage = calculateDamage(user, target, move);
                 damage *= typeMultiplier;
+                if (damage > target.hp) {
+                    damage = target.hp;
+                }
                 target.hp -= damage;
                 // Check the type multiplier and display the appropriate message
                 if (typeMultiplier < 1) {
@@ -282,15 +287,51 @@
   
             // If the move has an effect, apply it
             if (move.effect) {
-                move.effect(user, target);
+                switch (move.name) {
+                    case 'Calm Mind':
+                        // Calm Mind increases the user's Special Attack and Special Defense by 1 stage each
+                        user.spAtkLevel = applyStatChange(user.spAtkLevel, 1, user.name, 'Special Attack');
+                        user.spDefLevel = applyStatChange(user.spDefLevel, 1, user.name, 'Special Defense');
+                        break;
+                    case 'Shadow Ball':
+                        // Shadow Ball has a 20% chance to lower the target's Special Defense by 1 stage
+                        if (Math.random() < 0.2) {
+                            target.spDefLevel = applyStatChange(target.spDefLevel, -1, target.name, 'Special Defense');
+                        }
+                        break;
+                    case 'Ancient Power':
+                        // Ancient Power has a 10% chance to raise all of the user's stats by 1 stage
+                        if (Math.random() < 0.1) {
+                            user.spAtkLevel = applyStatChange(user.spAtkLevel, 1, user.name, 'Special Attack');
+                            user.spDefLevel = applyStatChange(user.spDefLevel, 1, user.name, 'Special Defense');
+                            user.speedLevel = applyStatChange(user.speedLevel, 1, user.name, 'Speed');
+                        }
+                        break;
+                    default:
+                        // For other moves, apply the effect as before
+                        move.effect(user, target);
+                        break;
+                }
+                console.log("Player spAtk:" + player.spAtkLevel);
+                console.log("Player spDef:" + player.spDefLevel);
+                console.log("Player speed:" + player.speedLevel);
+                console.log("Laplush spAtk:" + OpponentLaplush.spAtkLevel);
+                console.log("Laplush spDef:" + OpponentLaplush.spDefLevel);
+                console.log("Laplush speed:" + OpponentLaplush.speedLevel);
             }
 
             // Update the HP display
             if (target === player) {
                 player.hp = Math.floor(player.hp);
+                if (player.hp <= 0) {
+                    player.hp = 0;
+                }
                 document.getElementById('player-hp').textContent = 'Player HP: ' + player.hp;
             } else {
                 OpponentLaplush.hp = Math.floor(OpponentLaplush.hp);
+                if (OpponentLaplush.hp <= 0){
+                    OpponentLaplush.hp = 0;
+                }
                 document.getElementById('opponent-hp').textContent = 'Opponent HP: ' + OpponentLaplush.hp;
             }
 
@@ -301,6 +342,7 @@
             }
 
             if (OpponentLaplush.hp <= 0) {
+                OpponentLaplush.hp = 0;
                 document.getElementById('laplush').classList.add('fade-out');
                 var returnButton = document.createElement('button');
                 returnButton.textContent = 'Return to Home Page';
@@ -312,6 +354,7 @@
             }
 
             if (player.hp <= 0) {
+                player.hp = 0;
                 document.getElementById('player').classList.add('fade-out');
                 var tryAgainButton = document.createElement('button');
                 tryAgainButton.textContent = 'Try Again';
@@ -336,9 +379,28 @@
             }
             // Use special attack and special defense stats, multiplied by their respective stat multipliers
             var damage = baseDamage * typeMultiplier * (attacker.spAtk * statMulti[attacker.spAtkLevel]) / (defender.spDef * statMulti[defender.spDefLevel]);
+            // Check for critical hit
+            if (Math.random() < 1/24) {
+                damage *= 1.5;
+                console.log("A critical hit!");
+            }
+            // Apply high roll/low roll
+            damage *= Math.random() * (0.15) + 0.85;
             // Round down the damage
             damage = Math.floor(damage);
             return damage;
+        }
+
+        function applyStatChange(stat, change, playerName, statName) {
+            stat += change;
+            if (stat > 6) {
+                stat = 6;
+                console.log(playerName + "'s " + statName + " can no longer increase.");
+            } else if (stat < -6) {
+                stat = -6;
+                console.log(playerName + "'s " + statName + " can no longer decrease.");
+            }
+            return stat;
         }
 
         player.moveset = [
@@ -491,12 +553,12 @@
                         }
                     }
                     // Log the updated stats of the player and the opponent Laplush
-                    console.log("Player spAtk:" + player.spAtkLevel);
-                    console.log("Player spDef:" + player.spDefLevel);
-                    console.log("Player speed:" + player.speedLevel);
-                    console.log("Laplush spAtk:" + OpponentLaplush.spAtkLevel);
-                    console.log("Laplush spDef:" + OpponentLaplush.spDefLevel);
-                    console.log("Laplush speed:" + OpponentLaplush.speedLevel);
+                    // console.log("Player spAtk:" + player.spAtkLevel);
+                    // console.log("Player spDef:" + player.spDefLevel);
+                    // console.log("Player speed:" + player.speedLevel);
+                    // console.log("Laplush spAtk:" + OpponentLaplush.spAtkLevel);
+                    // console.log("Laplush spDef:" + OpponentLaplush.spDefLevel);
+                    // console.log("Laplush speed:" + OpponentLaplush.speedLevel);
                 };
             })(move));
 
