@@ -230,25 +230,24 @@
         var multiplier = typeChart["Fire"]["Grass"] * typeChart["Fire"]["Water"]; // to be reformated into Laplush
 
         function useMove(user, target, move) {
-            //  // Check if user, target, and move are defined (debug)
-            // if (!user || !target || !move) {
-            //     console.error('One or more arguments are undefined:', { user, target, move });
-            //     return;
-            // }
-
-            // // Check if user.name, target.name, and move.name are defined (debug)
-            // if (!user.name || !target.name || !move.name) {
-            //     console.error('One or more name properties are undefined:', { user, target, move });
-            //     return;
-            // }
-            
-            console.log(user.name + ' used ' + move.name /* + ' on ' + target.name*/ + '!'); // Display battle messages later
+            if (player.hp <= 0 || OpponentLaplush.hp <= 0) {
+                return;
+            }
             if (move.pp <= 0) {
-                console.log("Not enough PP for this move!");
+                console.log("You don't have enough PP for this move!");
                 return; // Make sure the player sees the message & the player can move again with another move
             }
             // Lowers the move's power points by 1
             move.pp--;
+
+            console.log(user.name + ' used ' + move.name /* + ' on ' + target.name*/ + '!'); // Display battle messages later
+
+            // Update the button text to show the remaining PP
+            if (user === player) {
+                var moveIndex = player.moveset.indexOf(move);
+                var button = document.getElementById('move' + (moveIndex + 1) + '-button');
+                button.textContent = move.name + ' (PP: ' + move.pp + ', Type: ' + move.type + ')';
+            }
 
             var userType = Array.isArray(user.type) ? user.type : [user.type];
             var targetType = Array.isArray(target.type) ? target.type : [target.type];
@@ -312,12 +311,12 @@
                         move.effect(user, target);
                         break;
                 }
-                console.log("Player spAtk:" + player.spAtkLevel);
-                console.log("Player spDef:" + player.spDefLevel);
-                console.log("Player speed:" + player.speedLevel);
-                console.log("Laplush spAtk:" + OpponentLaplush.spAtkLevel);
-                console.log("Laplush spDef:" + OpponentLaplush.spDefLevel);
-                console.log("Laplush speed:" + OpponentLaplush.speedLevel);
+                // console.log("Player spAtk:" + player.spAtkLevel);
+                // console.log("Player spDef:" + player.spDefLevel);
+                // console.log("Player speed:" + player.speedLevel);
+                // console.log("Laplush spAtk:" + OpponentLaplush.spAtkLevel);
+                // console.log("Laplush spDef:" + OpponentLaplush.spDefLevel);
+                // console.log("Laplush speed:" + OpponentLaplush.speedLevel);
             }
 
             // Update the HP display
@@ -378,7 +377,11 @@
                 typeMultiplier *= 1.5;
             }
             // Use special attack and special defense stats, multiplied by their respective stat multipliers
-            var damage = baseDamage * typeMultiplier * (attacker.spAtk * statMulti[attacker.spAtkLevel]) / (defender.spDef * statMulti[defender.spDefLevel]);
+            if (move.name != 'Struggle') {
+                var damage = baseDamage * typeMultiplier * (attacker.spAtk * statMulti[attacker.spAtkLevel]) / (defender.spDef * statMulti[defender.spDefLevel]);
+            } else {
+                var damage = baseDamage * typeMultiplier;
+            }
             // Check for critical hit
             if (Math.random() < 1/24) {
                 damage *= 1.5;
@@ -460,7 +463,18 @@
 
         OpponentLaplush.moveset = [
             {name: "Ice Beam", type: "Ice", power: 90, pp: 16}, // frostbite chance
-            {name: "Brine", type: "Water", power: 65, pp: 16}, // double damage when enemy has 50% or less HP
+            {
+                name: "Brine",
+                type: "Water",
+                power: 65,
+                pp: 10,
+                effect: function(user, target) {
+                    // If the defender has half or less HP, double the power
+                    if (target.hp <= target.maxHp / 2) {
+                        this.power *= 2;
+                    }
+                }
+            }, // double damage when enemy has 50% or less HP
             {name: "Thunderbolt", type: "Electric", power: 90, pp: 24}, // paralysis chance
             {
                 name: "Ancient Power", 
@@ -487,7 +501,17 @@
         // Get a random move from the opponent's moveset
         function getLaplushMove() {
             var randomIndex = Math.floor(Math.random() * OpponentLaplush.moveset.length);
+            var hasMovesLeft = OpponentLaplush.moveset.some(function(move) {
+                return move.pp > 0;
+            });
+            if (!hasMovesLeft) {
+                return {name: 'Struggle', type: 'Normal', power: 50, pp: Infinity};
+            }
+            if (OpponentLaplush.moveset[randomIndex].pp <= 0) {
+                return getLaplushMove();
+            }
             return OpponentLaplush.moveset[randomIndex];
+
         }
 
 
@@ -565,6 +589,35 @@
 
         
         }
+
+        // Get the move buttons by their unique IDs
+        var moveButton1 = document.getElementById('move1-button');
+        var moveButton2 = document.getElementById('move2-button');
+        var moveButton3 = document.getElementById('move3-button');
+        var moveButton4 = document.getElementById('move4-button');
+
+        // An array of all the move buttons
+        var moveButtons = [moveButton1, moveButton2, moveButton3, moveButton4];
+
+        // Function to check if a Pokémon has fainted and disable all buttons if it has
+        function checkFaintedAndDisableButtons() {
+            if (player.hp <= 0 || OpponentLaplush.hp <= 0) {
+                moveButtons.forEach(function(button) {
+                    button.disabled = true;
+                });
+            }
+        }
+
+        // Add an event listener to each button
+        moveButtons.forEach(function(button, index) {
+            button.addEventListener('click', function() {
+                // Use the move
+                useMove(player.moveset[index], player, OpponentLaplush);
+
+                // Check if a Pokémon has fainted and disable all buttons if it has
+                checkFaintedAndDisableButtons();
+            });
+        });
 
         window.onload = function() {
             // Display the initial HP of the player
