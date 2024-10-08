@@ -107,6 +107,10 @@
 </div>
 
 <audio id="faint-sound" src="augh.mp3" preload="auto"></audio>
+<audio id="player-win" src="pokemon-victory-theme.mp3" preload="auto"></audio>
+<audio id="hit-normal" src="Hit Normal Damage.mp3" preload="auto"></audio>
+<audio id="hit-super-effective" src="Hit Super Effective.mp3" preload="auto"></audio>
+<audio id="hit-not-very-effective" src="Hit Not Very Effective.mp3" preload="auto"></audio>
 
 <br>
 
@@ -309,16 +313,22 @@
                     damage = target.hp;
                 }
                 var targetPastHP = target.hp;
+                var hitSound;
                 target.hp -= damage;
                 // console.log('typeMultiplier: ', typeMultiplier);
                 // Check the type multiplier and display the appropriate message
                 if (typeMultiplier < 1) {
                     logBattleMessage("");
                     logBattleMessage("It's not very effective...");
+                    var hitSound = document.getElementById('hit-not-very-effective');
                 } else if (typeMultiplier > 1) {
                     logBattleMessage("");
                     logBattleMessage("It's super effective!");
+                    var hitSound = document.getElementById('hit-super-effective');
+                } else {
+                    var hitSound = document.getElementById('hit-normal');
                 }
+                hitSound.play();
                 logBattleMessage("");
                 logBattleMessage("It did " + Math.floor(targetPastHP - target.hp) + " damage!");
             }
@@ -382,11 +392,17 @@
 
             if (OpponentLaplush.hp <= 0) {
                 OpponentLaplush.hp = 0;
-                document.getElementById('laplush').classList.add('fade-out');
                 var sound = document.getElementById('faint-sound');
-                sound.play();
+                hitSound.onended = function() {
+                    document.getElementById('laplush').classList.add('fade-out');
+                    sound.play();
+                };
                 logBattleMessage("");
                 logBattleMessage(player.name + " has won the battle!");
+                var victoryTheme = document.getElementById('player-win');
+                sound.onended = function() {
+                    victoryTheme.play();
+                };
                 var returnButton = document.createElement('button');
                 returnButton.textContent = 'Return to Home Page';
                 returnButton.onclick = function() {
@@ -398,9 +414,11 @@
 
             if (player.hp <= 0) {
                 player.hp = 0;
-                document.getElementById('player').classList.add('fade-out');
                 var sound = document.getElementById('faint-sound');
-                sound.play();
+                hitSound.onended = function() {
+                    sound.play();
+                    document.getElementById('player').classList.add('fade-out');
+                }
                 logBattleMessage("");
                 logBattleMessage("Opposing Laplush has won the battle!");
                 var tryAgainButton = document.createElement('button');
@@ -736,6 +754,8 @@
 
                     if (player.status === 'Frostbite') {
                         var frostbiteDamage = Math.floor(player.maxHP / 16);
+                        var sound = document.getElementById('hit-normal');
+                        sound.play();
                         player.hp -= frostbiteDamage;
                         logBattleMessage("");
                         logBattleMessage(player.name + ' took ' + frostbiteDamage + ' damage from frostbite!');
@@ -746,7 +766,10 @@
                         player.hp = 0;
                         document.getElementById('player-hp').textContent = 'Player HP: ' + player.hp + " | " + player.status;
                         logBattleMessage("");
-                        logBattleMessage(player.name + ' has fainted!');
+                        hitSound.onended = function() {
+                            sound.play();
+                            document.getElementById('player').classList.add('fade-out');
+                        }
                         logBattleMessage("");
                         logBattleMessage("Opposing Laplush has won the battle!");
                         var sound = document.getElementById('faint-sound');
