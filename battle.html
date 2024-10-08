@@ -97,6 +97,8 @@
     <img id="laplush" class="pokemon" src="LaplushBattle.png">
 </div>
 
+<div id="battle-log" style="height: 100px; overflow-y: scroll; width: 980px; background-color: white; position: relative; margin: auto; padding: 10px;"></div>
+
 <div id="moveset-container">
     <button id="move1-button"></button>
     <button id="move2-button"></button>
@@ -106,7 +108,7 @@
 
 <audio id="faint-sound" src="augh.mp3" preload="auto"></audio>
 
-<br><br>
+<br>
 
 
     <!-- HP bar, enemy HP bar, attack (special), defend (special), attack boost, defense boost, speed, -->
@@ -117,6 +119,14 @@
     document.addEventListener('DOMContentLoaded', function() {   
         // var form = document.getElementById('typeForm');
         var battleFrame = document.getElementById('battle-frame');
+
+        function logBattleMessage(message) {
+            var battleLog = document.getElementById('battle-log');
+            battleLog.innerHTML += message + '<br>';
+            battleLog.scrollTop = battleLog.scrollHeight; // Scroll to the bottom
+        }
+
+        logBattleMessage("A wild Laplush appeared!");
         // var playerPokemonType = document.getElementById('pokemonType');
 
         // // debug lines
@@ -156,6 +166,9 @@
         var urlParams = new URLSearchParams(queryString);
 
         // Get the player type from the query string
+        player.name = urlParams.get('name');
+        logBattleMessage("");
+        logBattleMessage(player.name + " has entered the battle!");
         player.type = urlParams.get('type');
 
         var OpponentLaplush = {
@@ -242,18 +255,28 @@
         // }
 
         function useMove(user, target, move) {
+
+            // check if the move is valid
+            if (!move || typeof move.type !== 'string') {
+                // console.log('Invalid move');
+                return;
+            }
+
             if (player.hp <= 0 || OpponentLaplush.hp <= 0) {
                 return;
             }
+
+            logBattleMessage("");
+
             if (move.pp <= 0) {
-                console.log("You don't have enough PP for this move!");
+                logBattleMessage("You don't have enough PP for this move!");
                 return; // Make sure the player sees the message & the player can move again with another move
             }
             // Lowers the move's power points by 1
             move.pp--;
 
-            if (user.name === "Player" || user.name === "Laplush") {
-                console.log(user.name + ' used ' + move.name + '!'); // Display battle messages later
+            if (user.name === player.name || user.name === "Laplush") {
+                logBattleMessage(user.name + ' used ' + move.name + '!'); // Display battle messages later
             }
             // console.log(user.name + ' used ' + move.name /* + ' on ' + target.name*/ + '!'); // Display battle messages later
 
@@ -264,39 +287,40 @@
                 button.textContent = move.name + ' (PP: ' + move.pp + ', Type: ' + move.type + ')';
             }
 
-            var userType = Array.isArray(user.type) ? user.type : [user.type];
+            var moveType = move.type; // Get the move's type
             var targetType = Array.isArray(target.type) ? target.type : [target.type];
 
             var typeMultiplier = 1.0;
-            for (var i = 0; i < userType.length; i++) {
-                for (var j = 0; j < targetType.length; j++) {
-                    var userKey = userType[i].charAt(0).toUpperCase() + userType[i].slice(1);
-                    var targetKey = targetType[j].charAt(0).toUpperCase() + targetType[j].slice(1);
-                    // if (!typeChart[userKey]) {
-                    //     console.log('typeChart does not have property', userKey);
-                    // } else if (!typeChart[userKey][targetKey]) {
-                    //     console.log('typeChart[' + userKey + '] does not have property', targetKey);
-                    // }
-                    typeMultiplier *= typeChart[userKey][targetKey] || 1.0;
+            for (var j = 0; j < targetType.length; j++) {
+                var moveKey = moveType.charAt(0).toUpperCase() + moveType.slice(1);
+                var targetKey = targetType[j].charAt(0).toUpperCase() + targetType[j].slice(1);
+                // console.log('moveKey:', moveKey, 'targetKey:', targetKey); // Log the moveKey and targetKey
+                if (typeChart[moveKey] && typeChart[moveKey][targetKey]) {
+                    typeMultiplier *= typeChart[moveKey][targetKey];
                 }
+                // console.log('typeMultiplier: ', typeMultiplier); // Log the typeMultiplier
             }
 
             // If the move deals damage, apply it
-            
             if (move.power > 0) {
                 var damage = calculateDamage(user, target, move);
                 damage *= typeMultiplier;
                 if (damage > target.hp) {
                     damage = target.hp;
                 }
+                var targetPastHP = target.hp;
                 target.hp -= damage;
+                // console.log('typeMultiplier: ', typeMultiplier);
                 // Check the type multiplier and display the appropriate message
                 if (typeMultiplier < 1) {
-                    console.log("It's not very effective...");
+                    logBattleMessage("");
+                    logBattleMessage("It's not very effective...");
                 } else if (typeMultiplier > 1) {
-                    console.log("It's super effective!");
+                    logBattleMessage("");
+                    logBattleMessage("It's super effective!");
                 }
-                console.log("It did " + damage + " damage!");
+                logBattleMessage("");
+                logBattleMessage("It did " + Math.floor(targetPastHP - target.hp) + " damage!");
             }
   
             // If the move has an effect, apply it
@@ -351,7 +375,8 @@
 
             if (target.hp <= 0) {
                 target.hp = 0;
-                console.log(target.name + " has fainted!");
+                logBattleMessage("");
+                logBattleMessage(target.name + " has fainted!");
                 // document.getElementById('target').classList.add('fade-out'); // replace 'player' with the actual ID
             }
 
@@ -360,6 +385,8 @@
                 document.getElementById('laplush').classList.add('fade-out');
                 var sound = document.getElementById('faint-sound');
                 sound.play();
+                logBattleMessage("");
+                logBattleMessage(player.name + " has won the battle!");
                 var returnButton = document.createElement('button');
                 returnButton.textContent = 'Return to Home Page';
                 returnButton.onclick = function() {
@@ -374,6 +401,8 @@
                 document.getElementById('player').classList.add('fade-out');
                 var sound = document.getElementById('faint-sound');
                 sound.play();
+                logBattleMessage("");
+                logBattleMessage("Opposing Laplush has won the battle!");
                 var tryAgainButton = document.createElement('button');
                 tryAgainButton.textContent = 'Try Again';
                 tryAgainButton.onclick = function() {
@@ -412,7 +441,8 @@
             // Check for critical hit
             if (Math.random() < 1/24) {
                 damage *= 1.5;
-                console.log("A critical hit!");
+                logBattleMessage("");
+                logBattleMessage("A critical hit!");
             }
             // Apply high roll/low roll
             damage *= Math.random() * (0.15) + 0.85;
@@ -421,14 +451,14 @@
             return damage;
         }
 
-        function applyStatChange(stat, change, playerName, statName) {
+        function applyStatChange(stat, change, pName, statName) {
             stat += change;
             if (stat > 6) {
                 stat = 6;
-                console.log(playerName + "'s " + statName + " can no longer increase.");
+                logBattleMessage(pName + "'s " + statName + " can no longer increase.");
             } else if (stat < -6) {
                 stat = -6;
-                console.log(playerName + "'s " + statName + " can no longer decrease.");
+                logBattleMessage(pName + "'s " + statName + " can no longer decrease.");
             }
             return stat;
         }
@@ -442,7 +472,7 @@
             effect: function(user) {
                 user.spAtkLevel += 1;
                 user.spDefLevel += 1;
-                console.log("Calm Mind raised the user's spAtk and spDef!"); // Display battle messages later in a textfield
+                logBattleMessage("Calm Mind raised the user's spAtk and spDef!"); // Display battle messages later in a textfield
             }
         },
         {
@@ -468,7 +498,7 @@
                     // Otherwise, replenish user's HP by 50% (rounded down)
                     user.hp = Math.floor(user.hp + user.maxHP * 0.5);
                 }
-                console.log(user.name + " used Recover and restored its HP!");
+                logBattleMessage(user.name + " restored its HP!");
                 // console.log(user.name + "'s HP is now " + user.hp);
             }
         },
@@ -482,7 +512,7 @@
                     if (Math.random() < 0.2) {
                         target.spDefLevel -= 1;
                         // console.log("Shadow Ball lowered the opponent's spDef!"); // Display battle messages later
-                        console.log(target.name + "'s Special Defense fell!");
+                        logBattleMessage(target.name + "'s Special Defense fell!");
                     }
                 }
             }
@@ -500,7 +530,8 @@
                     // Apply the frostbite effect with a certain chance
                     if (Math.random() < 0.1) { // adjust the chance as needed
                         target.status = 'Frostbite';
-                        console.log(target.name + ' is frostbitten!');
+                        logBattleMessage("");
+                        logBattleMessage(target.name + ' is frostbitten!');
                     }
                 }
             }
@@ -528,7 +559,8 @@
                         // Apply the paralysis effect with a 10% chance
                         if (Math.random() < 0.1) {
                             target.status = 'Paralyzed';
-                            console.log(target.name + ' is paralyzed!');
+                            logBattleMessage("");
+                            logBattleMessage(target.name + ' is paralyzed!');
                             if (target === player) {
                                 document.getElementById('player-hp').innerHTML = 'HP: ' + target.hp + " | " + target.status;
                             } else {
@@ -551,7 +583,7 @@
                         user.spAtkLevel += 1;
                         user.spDefLevel += 1;
                         user.speedLevel += 1;
-                        console.log("Ancient Power raised all the user's stats!"); // Display battle messages later
+                        logBattleMessage("Ancient Power raised all the user's stats!"); // Display battle messages later
                     }
                 }
             }
@@ -617,7 +649,8 @@
                     if (playerSpeed > OpponentLaplushSpeed) {
                         // Player moves first
                         if (player.status === 'Paralyzed' && Math.random() < 0.5) {
-                            console.log(player.name + ' is paralyzed and can\'t move!');
+                            logBattleMessage("");
+                            logBattleMessage(player.name + ' is paralyzed and can\'t move!');
                             return;
                         } else {
                             useMove(player, target, move);
@@ -635,7 +668,8 @@
                         // Then player moves
                         if (player.hp > 0) {
                             if (player.status === 'Paralyzed' && Math.random() < 0.5) {
-                                console.log(player.name + ' is paralyzed and can\'t move!');
+                                logBattleMessage("");
+                                logBattleMessage(player.name + ' is paralyzed and can\'t move!');
                                 return;
                             } else {
                                 useMove(player, target, move);
@@ -646,7 +680,8 @@
                         if (Math.random() < 0.5) {
                             // Player moves first
                             if (player.status === 'Paralyzed' && Math.random() < 0.5) {
-                                console.log(player.name + ' is paralyzed and can\'t move!');
+                                logBattleMessage("");
+                                logBattleMessage(player.name + ' is paralyzed and can\'t move!');
                                 return;
                             } else {
                                 useMove(player, target, move);
@@ -665,7 +700,8 @@
                             // Then player moves
                             if (player.hp > 0) {
                                 if (player.status === 'Paralyzed' && Math.random() < 0.5) {
-                                    console.log(player.name + ' is paralyzed and can\'t move!');
+                                    logBattleMessage("");
+                                    logBattleMessage(player.name + ' is paralyzed and can\'t move!');
                                     return;
                                 } else {
                                     useMove(player, target, move);
@@ -677,17 +713,42 @@
                     // After handling the move, update the button's text and check if the move has no PP left
                     updateButton(move, button);
 
+                    // After the player's turn
+                    if (OpponentLaplush.heldItem == 'Leftovers' && OpponentLaplush.hp > 0 && player.hp > 0) {
+                        var recovery = Math.floor(OpponentLaplush.maxHP / 16);
+                        if (recovery > (OpponentLaplush.maxHP - OpponentLaplush.hp)) {
+                            recovery = OpponentLaplush.maxHP - OpponentLaplush.hp;
+                        }
+                        OpponentLaplush.hp += recovery;
+                        // logBattleMessage("Recovered " + recovery + " HP from Leftovers!");
+                        if (recovery > 0){
+                            logBattleMessage("");
+                            logBattleMessage(OpponentLaplush.name + ' healed ' + recovery + ' HP from its Leftovers!');
+                        }
+                        // // Make sure Laplush's HP doesn't exceed its max HP
+                        // if (laplush.hp > laplush.maxHP) {
+                        //     laplush.hp = laplush.maxHP;
+                        // }
+
+                        // Update Laplush's HP display
+                        document.getElementById('opponent-hp').textContent = 'Laplush HP: ' + OpponentLaplush.hp + " | " + OpponentLaplush.status;
+                    }
+
                     if (player.status === 'Frostbite') {
                         var frostbiteDamage = Math.floor(player.maxHP / 16);
                         player.hp -= frostbiteDamage;
-                        console.log(player.name + ' took ' + frostbiteDamage + ' damage from frostbite!');
+                        logBattleMessage("");
+                        logBattleMessage(player.name + ' took ' + frostbiteDamage + ' damage from frostbite!');
                     }
 
                     // Check if the player's HP is less than or equal to 0
                     if (player.hp <= 0 && player.status == 'Frostbite') {
                         player.hp = 0;
                         document.getElementById('player-hp').textContent = 'Player HP: ' + player.hp + " | " + player.status;
-                        console.log(player.name + ' has fainted!');
+                        logBattleMessage("");
+                        logBattleMessage(player.name + ' has fainted!');
+                        logBattleMessage("");
+                        logBattleMessage("Opposing Laplush has won the battle!");
                         var sound = document.getElementById('faint-sound');
                         sound.play();
                         var tryAgainButton = document.createElement('button');
@@ -753,10 +814,9 @@
 </html>
 
 <!-- To Do List: -->
-<!-- Implement struggle for player -->
-<!-- Implement leftovers for Laplush -->
-<!-- Implement HP bars -->
-<!-- Implement Text Field -->
+
+<!-- Implement HP bars  -->
+<!-- Implement Text Field to show console.log messages -->
 <!-- Beautify button UI -->
 <!-- PROBABLY SOLVED: Fix problem with it being Laplush's turn after player misclicks a move that has no PP -->
 

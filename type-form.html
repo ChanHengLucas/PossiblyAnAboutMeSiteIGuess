@@ -31,6 +31,8 @@
 
 <body>
     <form id="typeForm">    
+        <label for="playerName">Enter Player Name:</label><br><br>
+        <input type="text" id="playerName" name="playerName"><br><br>
         <label id="typeLabel" for="pokemonType">Choose a Pokémon Type:</label><br><br>
         <select id="pokemonType" name="pokemonType">
             <option value="Normal">Normal</option>
@@ -64,6 +66,7 @@
             event.preventDefault();
 
             // Get the value of the input field
+            var inputName = document.getElementById('playerName').value;
             var inputType = document.getElementById('pokemonType').value;
 
             // Check if the input is not empty
@@ -71,7 +74,7 @@
                 console.log('Player type is now: ' + inputType);
 
                 // Redirect to the battle page with the player type in the query string
-                window.location.href = 'battle.html?type=' + encodeURIComponent(inputType);
+                window.location.href = 'battle.html?name=' + encodeURIComponent(inputName) + '&type=' + encodeURIComponent(inputType) ;
             }
         });
     </script>
